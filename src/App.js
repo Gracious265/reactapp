@@ -1,10 +1,11 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import './App.css'
+import MovieCard from "./MovieCard";
 import SearchIcon from './search.svg'
 
 const API_URL = 'http://www.omdbapi.com/?i=tt3896198&apikey=1faa1330';
 
-const movie1 = {
+const movie = {
         "Title": "Batman & Robin",
         "Year": "1997",
         "imdbID": "tt0118688",
@@ -13,13 +14,17 @@ const movie1 = {
 }
 
 const App = () => {
+    const [movies, setMovies] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');       
+
     const searchMovies = async (title) => {
         const response = await fetch(`${API_URL}&s=${title}`);
         const data = await response.json();
-        console.log(data.Search);
+
+        setMovies(data.Search);
     }
     useEffect(() => {
-        searchMovies('Batman')
+        searchMovies('superman')
     }, []);
     return (
         <div className="app">
@@ -28,26 +33,32 @@ const App = () => {
             <div className="search">
                 <input 
                 placeholder="Search for movies" 
-                value="" 
-                onChange={() => {}}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <img 
                     src={SearchIcon}
                     alt="search"
-                    onClick={() => {}}
+                    onClick={() => searchMovies(searchTerm)}
+                    
                 />
             </div>
+            {
+                movies?.length > 0
+                    ? (
+                    <div className="container">
+                        {movies.map((movie) => (
+                            <MovieCard movie={movie}/>
+                        ))}
+                    </div>  
+                    ) : (
+                        <div className="empty">
+                            <h2>No movies Found</h2>
+                        </div>
+                    )
+            }
 
-            <div className="container">
-                <div className="movie">
-                    <div>
-                        <p>{movie1.Year}</p>
-                    </div>
-                    <div>
-                        <img src={movie1.Poster} alt={movie1.Title}/>
-                    </div>
-                </div>
-            </div>
+            
         </div>
           
     )
